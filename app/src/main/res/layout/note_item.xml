@@ -13,10 +13,12 @@
     app:cardElevation="12dp">
 
     <LinearLayout
+        android:id="@+id/note_container"
         android:layout_margin="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        >
 
         <TextView
             android:id="@+id/note_title"

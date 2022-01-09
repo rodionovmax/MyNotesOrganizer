@@ -1,6 +1,7 @@
 package com.gb.mynoteorganizer.data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class Note implements Serializable {
 
@@ -42,4 +43,5 @@ public class Note implements Serializable {
     public void setDescription(String description) {
         this.description = description;
     }
+
 }
