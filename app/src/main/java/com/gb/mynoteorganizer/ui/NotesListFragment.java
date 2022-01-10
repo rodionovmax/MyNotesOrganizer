@@ -1,6 +1,7 @@
 package com.gb.mynoteorganizer.ui;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -88,6 +89,27 @@ public class NotesListFragment extends Fragment implements NotesAdapter.OnNoteCl
 
     private void createEditNoteFragment(Bundle bundle) {
 
+        if (isLandscape()) {
+            showLandEditNotes(bundle);
+        } else {
+            showPortEditNotes(bundle);
+        }
+    }
+
+    private void showLandEditNotes(Bundle bundle) {
+        Fragment editNoteFragment = new EditNoteFragment();
+        if (bundle != null) {
+            editNoteFragment.setArguments(bundle);
+        }
+
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+        fragmentManager
+                .beginTransaction()
+                .replace(R.id.edit_note_container_land, editNoteFragment)
+                .commit();
+    }
+
+    private void showPortEditNotes(Bundle bundle) {
         Fragment editNoteFragment = new EditNoteFragment();
         if (bundle != null) {
             editNoteFragment.setArguments(bundle);
@@ -99,6 +121,10 @@ public class NotesListFragment extends Fragment implements NotesAdapter.OnNoteCl
                 .replace(R.id.notes_list_fragment_holder, editNoteFragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    public boolean isLandscape() {
+        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
 

@@ -1,6 +1,7 @@
 package com.gb.mynoteorganizer.ui;
 
 import android.app.DatePickerDialog;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -82,12 +83,23 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener {
         bundle.putBoolean(Constants.NOTE_NEW, true);
         notesListFragment.setArguments(bundle);
 
+        // Если ориентация портретная - перейти на фрагмент лист
+        // Если ориентация ландшафтная - перейти на фрагмент лист и удалить текущий фрагмент
         FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        fragmentManager
-                .beginTransaction()
-                .replace(R.id.notes_list_fragment_holder, notesListFragment)
-                .addToBackStack(null)
-                .commit();
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            fragmentManager
+                    .beginTransaction()
+                    .replace(R.id.notes_list_fragment_holder, notesListFragment)
+                    .addToBackStack(null)
+                    .commit();
+        } else {
+            fragmentManager
+                    .beginTransaction()
+                    .replace(R.id.notes_list_fragment_holder, notesListFragment)
+                    .remove(this)
+                    .commit();
+        }
+
     }
 
 
