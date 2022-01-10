@@ -60,13 +60,14 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
 
         private TextView title;
         private TextView description;
+        private TextView tvDate;
         private Note note;
-
 
         public NoteHolder(@NonNull View itemView, NotesAdapter.OnNoteClickListener listener) {
             super(itemView);
             title = itemView.findViewById(R.id.note_title);
             description = itemView.findViewById(R.id.note_description);
+            tvDate = itemView.findViewById(R.id.note_date);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -79,6 +80,11 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteHolder> 
             this.note = note;
             title.setText(note.getTitle());
             description.setText(note.getDescription());
+            if (note.getDate() != null) {
+                tvDate.setText(new SimpleDateFormat("dd-MM-yyyy").format(note.getDate()));
+            } else {
+                tvDate.setText("");
+            }
         }
     }
 }

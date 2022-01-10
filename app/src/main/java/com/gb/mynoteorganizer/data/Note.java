@@ -8,16 +8,19 @@ public class Note implements Serializable {
     private int id;
     private String title;
     private String description;
+    private Date date;
 
-    public Note(int id, String title, String description) {
+    public Note(int id, String title, String description, Date date) {
         this.id = id;
         this.title = title;
         this.description = description;
+        this.date = date;
     }
 
-    public Note(String title, String description) {
+    public Note(String title, String description, Date date) {
         this.title = title;
         this.description = description;
+        this.date = date;
     }
 
     public int getId() {
@@ -42,6 +45,14 @@ public class Note implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
 }

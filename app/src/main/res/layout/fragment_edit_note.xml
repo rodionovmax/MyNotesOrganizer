@@ -11,7 +11,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="24sp"
-        android:hint="@string/edit_note_title"/>
+        android:hint="@string/edit_note_title"
+        android:textStyle="bold"/>
+
+    <EditText
+        android:id="@+id/date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/edit_text_due_date"
+        android:textSize="20sp" />
 
     <EditText
         android:id="@+id/edit_note_description"
