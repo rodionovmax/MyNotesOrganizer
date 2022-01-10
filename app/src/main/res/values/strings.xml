@@ -7,4 +7,11 @@
     <string name="update_note_btn">Update note</string>
     <string name="edit_text_due_date">Due Date</string>
     <string name="due_date_btn">Due Date</string>
+    <string name="importance_txt">Importance:</string>
+
+    <string-array name="importance">
+        <item>Not Important</item>
+        <item>Important</item>
+        <item>Critical</item>
+    </string-array>
 </resources>

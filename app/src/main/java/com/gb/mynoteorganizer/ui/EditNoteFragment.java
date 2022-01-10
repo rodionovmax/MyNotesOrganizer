@@ -11,12 +11,16 @@ import androidx.fragment.app.FragmentManager;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.gb.mynoteorganizer.R;
@@ -30,17 +34,20 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class EditNoteFragment extends Fragment implements View.OnClickListener {
+public class EditNoteFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private static final String NOTE = "NOTE";
-    private EditText title;
-    private EditText description;
+    private static final String TAG = "myLogger";
+    private EditText evTitle;
+    private EditText evDescription;
     private Button datePickerBtn;
     private TextView tvDate;
     private Button saveNote;
     private Note note;
     private Date date;
+    private String importance;
     private DatePickerDialog datePicker;
+    private Spinner spinner;
 
     private int id = -1;
 
@@ -58,28 +65,38 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        title = view.findViewById(R.id.edit_note_title);
-        description = view.findViewById(R.id.edit_note_description);
+        evTitle = view.findViewById(R.id.edit_note_title);
+        evDescription = view.findViewById(R.id.edit_note_description);
         datePickerBtn = view.findViewById(R.id.date_picker_btn);
         tvDate = view.findViewById(R.id.date);
+        spinner = view.findViewById(R.id.importance_spinner);
         saveNote = view.findViewById(R.id.edit_note_update_btn);
 
         Bundle args = getArguments();
         if (args != null) {
             note = (Note) args.getSerializable(NOTE);
             id = note.getId();
-            title.setText(note.getTitle());
-            description.setText(note.getDescription());
+            evTitle.setText(note.getTitle());
+            evDescription.setText(note.getDescription());
             tvDate.setText(new SimpleDateFormat("dd-MM-yyyy").format(note.getDate()));
+            spinner.setSelection(0);
         }
 
         // Сделать кнопку неактивной если title пустой
         setButtonActiveIfTitleNotEmpty();
-        title.addTextChangedListener(titleTextWatcher);
+        evTitle.addTextChangedListener(titleTextWatcher);
 
+        // Слушатель на кнопку
         saveNote.setOnClickListener(this);
 
+        // Слушатель на Date Picker
         datePickerBtn.setOnClickListener(view1 -> showDatePicker());
+
+        // Слушатель на Spinner
+        ArrayAdapter<CharSequence> arrayAdapter = ArrayAdapter.createFromResource(getContext(), R.array.importance, R.layout.style_spinner_item);
+        arrayAdapter.setDropDownViewResource(R.layout.style_spinner_item);
+        spinner.setAdapter(arrayAdapter);
+        spinner.setOnItemSelectedListener(this);
     }
 
     private void showDatePicker() {
@@ -92,14 +109,8 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener {
                 new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        tvDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
-
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                        try {
-                            date = sdf.parse(tvDate.getText().toString());
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
+                        tvDate.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
+                        setDateFromTextView();
                     }
                 }, year, month, day);
         datePicker.show();
@@ -108,7 +119,11 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
 
-        Note updatedNote = new Note(id, title.getText().toString(), description.getText().toString(), date);
+        if (date == null) {
+            setDateFromTextView();
+        }
+
+        Note updatedNote = new Note(id, evTitle.getText().toString(), evDescription.getText().toString(), date, importance);
 
         if (id == -1) {
             repo.create(updatedNote);
@@ -159,10 +174,43 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener {
         }
     };
 
+    private void setDateFromTextView() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        try {
+            date = sdf.parse(tvDate.getText().toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void setButtonActiveIfTitleNotEmpty() {
-        String titleInput = title.getText().toString().trim();
+        String titleInput = evTitle.getText().toString().trim();
         saveNote.setEnabled(!titleInput.isEmpty());
     }
 
+    // Слушатель spinner
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        String choice = adapterView.getItemAtPosition(i).toString();
+        importance = choice;
+//        switch (i) {
+//            // not important
+//            case 0:
+//                importance = 0;
+//                break;
+//            // important
+//            case 1:
+//                importance = 1;
+//                break;
+//            // critical
+//            case 2:
+//                importance = 2;
+//                break;
+//        }
+    }
 
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
 }
