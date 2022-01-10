@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.gb.mynoteorganizer.R;
 import com.gb.mynoteorganizer.data.Constants;
@@ -34,7 +35,8 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener {
     private static final String NOTE = "NOTE";
     private EditText title;
     private EditText description;
-    private EditText evDate;
+    private Button datePickerBtn;
+    private TextView tvDate;
     private Button saveNote;
     private Note note;
     private Date date;
@@ -58,7 +60,8 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener {
 
         title = view.findViewById(R.id.edit_note_title);
         description = view.findViewById(R.id.edit_note_description);
-        evDate = view.findViewById(R.id.date);
+        datePickerBtn = view.findViewById(R.id.date_picker_btn);
+        tvDate = view.findViewById(R.id.date);
         saveNote = view.findViewById(R.id.edit_note_update_btn);
 
         Bundle args = getArguments();
@@ -67,7 +70,7 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener {
             id = note.getId();
             title.setText(note.getTitle());
             description.setText(note.getDescription());
-            evDate.setText(new SimpleDateFormat("dd-MM-yyyy").format(note.getDate()));
+            tvDate.setText(new SimpleDateFormat("dd-MM-yyyy").format(note.getDate()));
         }
 
         // Сделать кнопку неактивной если title пустой
@@ -76,7 +79,7 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener {
 
         saveNote.setOnClickListener(this);
 
-        evDate.setOnClickListener(view1 -> showDatePicker());
+        datePickerBtn.setOnClickListener(view1 -> showDatePicker());
     }
 
     private void showDatePicker() {
@@ -89,11 +92,11 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener {
                 new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        evDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
+                        tvDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
 
                         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                         try {
-                            date = sdf.parse(evDate.getText().toString());
+                            date = sdf.parse(tvDate.getText().toString());
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }

@@ -6,4 +6,5 @@
     <string name="edit_note_description">Description</string>
     <string name="update_note_btn">Update note</string>
     <string name="edit_text_due_date">Due Date</string>
+    <string name="due_date_btn">Due Date</string>
 </resources>
