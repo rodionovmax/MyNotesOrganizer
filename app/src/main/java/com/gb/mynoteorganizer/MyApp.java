@@ -32,7 +32,7 @@ public class MyApp extends Application {
             e.printStackTrace();
         }
 
-        String not_important = "Not Important";
+        int not_important = 0;
 
         repo.create(new Note("Title 1", "Description 1", date, not_important));
         repo.create(new Note("Title 2", "Description 2", date, not_important));

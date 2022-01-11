@@ -45,7 +45,7 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
     private Button saveNote;
     private Note note;
     private Date date;
-    private String importance;
+    private int importance;
     private DatePickerDialog datePicker;
     private Spinner spinner;
 
@@ -86,9 +86,7 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
             if (note.getDate() != null) {
                 tvDate.setText(new SimpleDateFormat("dd-MM-yyyy").format(note.getDate()));
             }
-            int position = getIndex(spinner, note.getImportance());
-            spinner.setSelection(position);
-
+            spinner.setSelection(note.getImportance());
         }
 
         // Сделать кнопку неактивной если title пустой
@@ -103,15 +101,6 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
 
         // Слушатель на Spinner
         spinner.setOnItemSelectedListener(this);
-    }
-
-    private int getIndex(Spinner spinner, String s) {
-        for (int i = 0; i < spinner.getCount(); i++) {
-            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(s)) {
-                return i;
-            }
-        }
-        return 0;
     }
 
     private void showDatePicker() {
@@ -207,22 +196,8 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
     // Слушатель spinner
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        String choice = adapterView.getItemAtPosition(i).toString();
-        importance = choice;
-//        switch (i) {
-//            // not important
-//            case 0:
-//                importance = 0;
-//                break;
-//            // important
-//            case 1:
-//                importance = 1;
-//                break;
-//            // critical
-//            case 2:
-//                importance = 2;
-//                break;
-//        }
+        adapterView.getItemAtPosition(i).toString();
+        importance = i;
     }
 
     @Override
