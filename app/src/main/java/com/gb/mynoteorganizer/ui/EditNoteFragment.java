@@ -72,14 +72,23 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
         spinner = view.findViewById(R.id.importance_spinner);
         saveNote = view.findViewById(R.id.edit_note_update_btn);
 
+        // Adapter for spinner
+        ArrayAdapter<CharSequence> arrayAdapter = ArrayAdapter.createFromResource(getContext(), R.array.importance, R.layout.style_spinner_item);
+        arrayAdapter.setDropDownViewResource(R.layout.style_spinner_item);
+        spinner.setAdapter(arrayAdapter);
+
         Bundle args = getArguments();
         if (args != null) {
             note = (Note) args.getSerializable(NOTE);
             id = note.getId();
             evTitle.setText(note.getTitle());
             evDescription.setText(note.getDescription());
-            tvDate.setText(new SimpleDateFormat("dd-MM-yyyy").format(note.getDate()));
-            spinner.setSelection(0);
+            if (note.getDate() != null) {
+                tvDate.setText(new SimpleDateFormat("dd-MM-yyyy").format(note.getDate()));
+            }
+            int position = getIndex(spinner, note.getImportance());
+            spinner.setSelection(position);
+
         }
 
         // Сделать кнопку неактивной если title пустой
@@ -93,10 +102,16 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
         datePickerBtn.setOnClickListener(view1 -> showDatePicker());
 
         // Слушатель на Spinner
-        ArrayAdapter<CharSequence> arrayAdapter = ArrayAdapter.createFromResource(getContext(), R.array.importance, R.layout.style_spinner_item);
-        arrayAdapter.setDropDownViewResource(R.layout.style_spinner_item);
-        spinner.setAdapter(arrayAdapter);
         spinner.setOnItemSelectedListener(this);
+    }
+
+    private int getIndex(Spinner spinner, String s) {
+        for (int i = 0; i < spinner.getCount(); i++) {
+            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(s)) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     private void showDatePicker() {
@@ -174,6 +189,7 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
         }
     };
 
+    // Установить note date из значения полученного из textview
     private void setDateFromTextView() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         try {
