@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">MyNoteOrganizer</string>
+    <string name="app_name">Notepad</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="edit_note_title">Title</string>
+    <string name="edit_note_description">Description</string>
+    <string name="update_note_btn">Update note</string>
 </resources>

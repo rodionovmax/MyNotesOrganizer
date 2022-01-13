@@ -8,9 +8,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MyNoteOrganizer">
+        android:theme="@style/Theme.MyNoteOrganizer"
+        android:name=".MyApp">
         <activity
-            android:name=".NotesListActivity"
+            android:name=".ui.NotesListActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
