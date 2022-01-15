@@ -1,6 +1,7 @@
 package com.gb.mynoteorganizer.ui;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
@@ -64,6 +65,7 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG, "Edit onViewCreated() called with: view = [Edit], savedInstanceState = [" + savedInstanceState + "]");
 
         evTitle = view.findViewById(R.id.edit_note_title);
         evDescription = view.findViewById(R.id.edit_note_description);
@@ -80,13 +82,15 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
         Bundle args = getArguments();
         if (args != null) {
             note = (Note) args.getSerializable(NOTE);
-            id = note.getId();
-            evTitle.setText(note.getTitle());
-            evDescription.setText(note.getDescription());
-            if (note.getDate() != null) {
-                tvDate.setText(new SimpleDateFormat("dd-MM-yyyy").format(note.getDate()));
+            if (note != null) {
+                id = note.getId();
+                evTitle.setText(note.getTitle());
+                evDescription.setText(note.getDescription());
+                if (note.getDate() != null) {
+                    tvDate.setText(new SimpleDateFormat("dd-MM-yyyy").format(note.getDate()));
+                }
+                spinner.setSelection(note.getImportance());
             }
-            spinner.setSelection(note.getImportance());
         }
 
         // Сделать кнопку неактивной если title пустой
@@ -101,6 +105,38 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
 
         // Слушатель на Spinner
         spinner.setOnItemSelectedListener(this);
+    }
+
+    // Сохраняем title и description чтобы их можно было восстановить при повороте экрана
+//    @Override
+//    public void onSaveInstanceState(@NonNull Bundle outState) {
+//        Log.d(TAG, "Edit onSaveInstanceState() called with: outState = [" + outState + "]");
+//        outState.putSerializable(Constants.NOTE, note);
+//        super.onSaveInstanceState(outState);
+//    }
+//
+//    // Восстанавливаем title и description
+//    @Override
+//    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+//        super.onViewStateRestored(savedInstanceState);
+//        if (savedInstanceState != null) {
+//            if (note != null) {
+//                Note saved_note = (Note) savedInstanceState.getSerializable(Constants.NOTE);
+//
+//                evTitle.setText(note.getTitle());
+//                evDescription.setText(note.getDescription());
+//
+//                Log.d(TAG, "Edit onViewStateRestored: " + saved_note.getTitle());
+//                Log.d(TAG, "Edit onViewStateRestored: " + saved_note.getDescription());
+//            }
+//        }
+//    }
+
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.d(TAG, "Edit onConfigurationChanged() called with: newConfig = [" + newConfig + "]");
     }
 
     private void showDatePicker() {
@@ -147,7 +183,7 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
             fragmentManager
                     .beginTransaction()
                     .replace(R.id.notes_list_fragment_holder, notesListFragment)
-                    .addToBackStack(null)
+//                    .addToBackStack(null)
                     .commit();
         } else {
             fragmentManager
@@ -204,4 +240,36 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(TAG, "Edit onCreate() called with: savedInstanceState = [" + savedInstanceState + "]");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "Edit onDestroy() called");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(TAG, "Edit onDestroyView() called");
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        Log.d(TAG, "Edit onAttach() called with: context = [" + context + "]");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d(TAG, "Edit onDetach() called");
+    }
+
+
 }

@@ -20,11 +20,14 @@ public class NotesListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes_list);
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.notes_list_fragment_holder, new NotesListFragment())
-                .addToBackStack(null)
-                .commit();
+        if (savedInstanceState == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.notes_list_fragment_holder, new NotesListFragment())
+                    .commit();
+        }
+
+
 
     }
 
