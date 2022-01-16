@@ -7,12 +7,13 @@
     android:layout_height="match_parent"
     tools:context=".ui.NotesListActivity">
 
-    <FrameLayout
+    <!--new view. ask teacher why we're not using this-->
+    <androidx.fragment.app.FragmentContainerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/notes_list_fragment_holder"
         android:background="@color/orange_background">
-    </FrameLayout>
+    </androidx.fragment.app.FragmentContainerView>
 
 
 </LinearLayout>

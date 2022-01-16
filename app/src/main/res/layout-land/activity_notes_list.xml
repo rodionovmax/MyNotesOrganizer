@@ -7,15 +7,15 @@
     android:layout_height="match_parent"
     tools:context=".ui.NotesListActivity">
 
-    <FrameLayout
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/notes_list_fragment_holder"
         android:layout_width="0px"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:background="@color/orange_background">
-    </FrameLayout>
+    </androidx.fragment.app.FragmentContainerView>
 
-    <FrameLayout
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/edit_note_container_land"
         android:layout_width="0px"
         android:layout_height="match_parent"

@@ -54,12 +54,33 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
 
     private Repo repo = RepoImpl.getInstance();
 
+    private INoteListActivity listener;
+
+    public static Fragment newInstance(Note note) {
+        Fragment fragment = new EditNoteFragment();
+        if (note != null) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(NOTE, note);
+            fragment.setArguments(bundle);
+        }
+        return fragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_edit_note, container, false);
 
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        Log.d(TAG, "Edit onAttach() called with: context = [" + context + "]");
+        if (context instanceof INoteListActivity) {
+            listener = (INoteListActivity) context;
+        }
     }
 
     @Override
@@ -105,6 +126,8 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
 
         // Слушатель на Spinner
         spinner.setOnItemSelectedListener(this);
+
+        listener.saveNote(note);
     }
 
     // Сохраняем title и description чтобы их можно было восстановить при повороте экрана
@@ -178,19 +201,11 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
 
         // Если ориентация портретная - перейти на фрагмент лист
         // Если ориентация ландшафтная - перейти на фрагмент лист и удалить текущий фрагмент
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            fragmentManager
-                    .beginTransaction()
-                    .replace(R.id.notes_list_fragment_holder, notesListFragment)
-//                    .addToBackStack(null)
-                    .commit();
+            listener.replaceNotesListPort(true);
         } else {
-            fragmentManager
-                    .beginTransaction()
-                    .replace(R.id.notes_list_fragment_holder, notesListFragment)
-                    .remove(this)
-                    .commit();
+            listener.removeEditNoteFragment();
+            listener.replaceNotesListLand();
         }
 
     }
@@ -259,11 +274,7 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
         Log.d(TAG, "Edit onDestroyView() called");
     }
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        Log.d(TAG, "Edit onAttach() called with: context = [" + context + "]");
-    }
+
 
     @Override
     public void onDetach() {

@@ -1,6 +1,7 @@
 package com.gb.mynoteorganizer.ui;
 
 import static com.gb.mynoteorganizer.data.Constants.NOTE;
+import static com.gb.mynoteorganizer.data.Constants.NOTE_NEW;
 
 import android.content.Context;
 import android.content.Intent;
@@ -45,11 +46,32 @@ public class NotesListFragment extends Fragment implements NotesAdapter.OnNoteCl
     private NotesAdapter adapter;
     private Note note;
 
+    private INoteListActivity listener;
+
+    public static Fragment newInstance(boolean isNoteNew) {
+        Fragment fragment = new NotesListFragment();
+        if (isNoteNew) {
+            Bundle bundle = new Bundle();
+            bundle.putBoolean(NOTE_NEW, true);
+            fragment.setArguments(bundle);
+        }
+        return fragment;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        Log.d(TAG, "List onAttach() called with: context = [" + context + "]");
+        // для инициализации интерфейса. чтобы не привязывать интерфейс к конструктору
+        if (context instanceof INoteListActivity) {
+            listener = (INoteListActivity) context;
+        }
     }
 
     @Override
@@ -86,9 +108,9 @@ public class NotesListFragment extends Fragment implements NotesAdapter.OnNoteCl
 
     @Override
     public void onNoteClick(Note note) {
-        Bundle args = new Bundle();
-        args.putSerializable(NOTE, note);
-        createEditNoteFragment(args);
+
+        // переименовать в то что реализуется
+        createEditNoteFragment(note);
     }
 
 
@@ -109,11 +131,13 @@ public class NotesListFragment extends Fragment implements NotesAdapter.OnNoteCl
         return super.onOptionsItemSelected(item);
     }
 
-    private void createEditNoteFragment(Bundle bundle) {
+    private void createEditNoteFragment(Note note) {
         if (isLandscape()) {
-            showLandEditNotes(bundle);
+            listener.replaceEditNoteLand(note);
+//            showLandEditNotes(note);
         } else {
-            showPortEditNotes(bundle);
+            listener.replaceEditNotePort(note);
+//            showPortEditNotes(bundle);
         }
     }
 
@@ -130,19 +154,21 @@ public class NotesListFragment extends Fragment implements NotesAdapter.OnNoteCl
                 .commit();
     }
 
-    private void showPortEditNotes(Bundle bundle) {
-        Fragment editNoteFragment = new EditNoteFragment();
-        if (bundle != null) {
-            editNoteFragment.setArguments(bundle);
-        }
 
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        fragmentManager
-                .beginTransaction()
-                .replace(R.id.notes_list_fragment_holder, editNoteFragment)
-                .addToBackStack(null)
-                .commit();
-    }
+
+//    private void showPortEditNotes(Bundle bundle) {
+//        Fragment editNoteFragment = new EditNoteFragment();
+//        if (bundle != null) {
+//            editNoteFragment.setArguments(bundle);
+//        }
+//
+//        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+//        fragmentManager
+//                .beginTransaction()
+//                .replace(R.id.notes_list_fragment_holder, editNoteFragment)
+//                .addToBackStack(null)
+//                .commit();
+//    }
 
     public boolean isLandscape() {
         return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
@@ -160,11 +186,7 @@ public class NotesListFragment extends Fragment implements NotesAdapter.OnNoteCl
         Log.d(TAG, "List onDestroyView() called");
     }
 
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        Log.d(TAG, "List onAttach() called with: context = [" + context + "]");
-    }
+
 
     @Override
     public void onDetach() {
