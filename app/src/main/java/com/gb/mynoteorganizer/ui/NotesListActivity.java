@@ -25,15 +25,9 @@ public class NotesListActivity extends BaseActivity implements INoteListActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes_list);
 
-//        if (savedInstanceState == null) {
-//            replaceNotesListPort(false);
-//        }
-
-
-
-//        if (getIntent().hasExtra(Constants.NOTE)) {
-//            note = (Note) getIntent().getSerializableExtra(Constants.NOTE);
-//        }
+        if (savedInstanceState != null) {
+            note = (Note) savedInstanceState.getSerializable(Constants.NOTE);
+        }
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             replaceNotesListPort(false);
         } else {
@@ -43,11 +37,11 @@ public class NotesListActivity extends BaseActivity implements INoteListActivity
 
     }
 
+
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(Constants.NOTE, note);
+        outState.putSerializable(Constants.NOTE, note);
     }
 
     @Override
