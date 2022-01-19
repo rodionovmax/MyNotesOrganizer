@@ -16,9 +16,13 @@ import com.gb.mynoteorganizer.data.Repo;
 import com.gb.mynoteorganizer.data.RepoImpl;
 import com.gb.mynoteorganizer.recycler.NotesAdapter;
 
-public class NotesListActivity extends BaseActivity implements INoteListActivity {
+public class NotesListActivity extends BaseActivity implements INoteListActivity
+        , NoteDialog.NoteDialogController
+{
 
     private Note note = null;
+    private Repo repo = RepoImpl.getInstance();
+    private NotesAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +84,19 @@ public class NotesListActivity extends BaseActivity implements INoteListActivity
     @Override
     public void saveNote(Note note) {
         this.note = note;
+    }
+
+    @Override
+    public void update(Note note) {
+        repo.update(note);
+        adapter.setNotes(repo.getAll());
+    }
+
+    @Override
+    public void create(String title, String description) {
+        repo.create(title, description);
+        // TODO: add date and importance
+        adapter.setNotes(repo.getAll());
     }
 }
 

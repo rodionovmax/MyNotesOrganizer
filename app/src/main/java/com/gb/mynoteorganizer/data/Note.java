@@ -26,6 +26,12 @@ public class Note implements Serializable {
         this.importance = importance;
     }
 
+    public Note(int id, String title, String description) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+    }
+
     public int getId() {
         return id;
     }

@@ -1,18 +1,16 @@
 package com.gb.mynoteorganizer.ui;
 
-import static com.gb.mynoteorganizer.data.Constants.NOTE;
 import static com.gb.mynoteorganizer.data.Constants.NOTE_NEW;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,11 +21,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.gb.mynoteorganizer.R;
 import com.gb.mynoteorganizer.data.Constants;
@@ -36,10 +29,12 @@ import com.gb.mynoteorganizer.data.Repo;
 import com.gb.mynoteorganizer.data.RepoImpl;
 import com.gb.mynoteorganizer.recycler.NotesAdapter;
 
-import java.text.SimpleDateFormat;
 
-
-public class NotesListFragment extends Fragment implements NotesAdapter.OnNoteClickListener {
+public class NotesListFragment extends Fragment
+        implements NotesAdapter.OnNoteClickListener,
+        NotesAdapter.OnPopupMenuClickListener
+//        , NoteDialog.NoteDialogController
+{
 
     private static final String TAG = "myLogger";
     private Repo repo = RepoImpl.getInstance();
@@ -47,6 +42,7 @@ public class NotesListFragment extends Fragment implements NotesAdapter.OnNoteCl
     private Note note;
 
     private INoteListActivity listener;
+//    private NoteDialog.NoteDialogController dialogController;
 
     public static Fragment newInstance(boolean isNoteNew) {
         Fragment fragment = new NotesListFragment();
@@ -68,10 +64,15 @@ public class NotesListFragment extends Fragment implements NotesAdapter.OnNoteCl
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         Log.d(TAG, "List onAttach() called with: context = [" + context + "]");
+
         // для инициализации интерфейса. чтобы не привязывать интерфейс к конструктору
         if (context instanceof INoteListActivity) {
             listener = (INoteListActivity) context;
         }
+
+//        if (context instanceof NoteDialog.NoteDialogController) {
+//            dialogController = (NoteDialog.NoteDialogController) context;
+//        }
     }
 
     @Override
@@ -92,18 +93,36 @@ public class NotesListFragment extends Fragment implements NotesAdapter.OnNoteCl
         adapter = new NotesAdapter();
         adapter.setNotes(repo.getAll());
 
-        adapter.setOnClickListener(this);
+        adapter.setOnNoteClickListener(this);
+        adapter.setOnPopupMenuClickListener(this);
 
         RecyclerView recyclerView = view.findViewById(R.id.notes_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
 
-//        Bundle bundle = getArguments();
-//        if (savedInstanceState != null) {
-//            if (isLandscape()) {
-//                showLandEditNotes(bundle);
-//            }
-//        }
+        // Для удаления заметки по swipe
+        ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+            @Override
+            public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+                return makeMovementFlags(0, swipeFlags);
+            }
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                NotesAdapter.NoteHolder holder = (NotesAdapter.NoteHolder) viewHolder;
+                Note note = holder.getNote();
+                repo.delete(note);
+                adapter.delete(repo.getAll(), position);
+            }
+        });
+        touchHelper.attachToRecyclerView(recyclerView);
     }
 
     @Override
@@ -175,23 +194,61 @@ public class NotesListFragment extends Fragment implements NotesAdapter.OnNoteCl
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "List onDestroy() called");
+    public void onPopupMenuClick(int command, Note note, int position) {
+        switch (command) {
+            case R.id.context_add_new:
+                // TODO: hadle pressing new note
+
+                return;
+            case R.id.context_edit:
+                NoteDialog.getInstance(note)
+                        .show(
+//                                getParentFragmentManager(),
+//                                getChildFragmentManager(),
+                                getFragmentManager(),
+                                Constants.NOTE
+                        );
+                return;
+            case R.id.context_delete:
+                repo.delete(note);
+                adapter.delete(repo.getAll(), position);
+                return;
+        }
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.d(TAG, "List onDestroyView() called");
-    }
+//    @Override
+//    public void update(Note note) {
+//        repo.update(note);
+//        adapter.setNotes(repo.getAll());
+//    }
+//
+//    @Override
+//    public void create(String title, String description) {
+//        repo.create(title, description);
+//        // TODO: add date and importance
+//        adapter.setNotes(repo.getAll());
+//    }
+
+//    @Override
+//    public void onDestroy() {
+//        super.onDestroy();
+//        Log.d(TAG, "List onDestroy() called");
+//    }
+//
+//    @Override
+//    public void onDestroyView() {
+//        super.onDestroyView();
+//        Log.d(TAG, "List onDestroyView() called");
+//    }
+//
+//
+//
+//    @Override
+//    public void onDetach() {
+//        super.onDetach();
+//        Log.d(TAG, "List onDetach() called");
+//    }
 
 
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.d(TAG, "List onDetach() called");
-    }
 }
 
