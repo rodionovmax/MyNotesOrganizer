@@ -32,18 +32,17 @@ import com.gb.mynoteorganizer.recycler.NotesAdapter;
 
 public class NotesListFragment extends Fragment
         implements NotesAdapter.OnNoteClickListener,
-        NotesAdapter.OnPopupMenuClickListener
-//        , NoteDialog.NoteDialogController
+        NotesAdapter.OnPopupMenuClickListener,
+        NoteDialog.NoteDialogController
 {
 
     private static final String TAG = "myLogger";
-    private Repo repo = RepoImpl.getInstance();
+    private final Repo repo = RepoImpl.getInstance();
     private NotesAdapter adapter;
-    private Note note;
 
     private INoteListActivity listener;
-//    private NoteDialog.NoteDialogController dialogController;
 
+    // Создаем статический экземпляр лист фрагмента чтобы вызывать его в активити
     public static Fragment newInstance(boolean isNoteNew) {
         Fragment fragment = new NotesListFragment();
         if (isNoteNew) {
@@ -65,20 +64,16 @@ public class NotesListFragment extends Fragment
         super.onAttach(context);
         Log.d(TAG, "List onAttach() called with: context = [" + context + "]");
 
-        // для инициализации интерфейса. чтобы не привязывать интерфейс к конструктору
+        // Для инициализации интерфейса. Чтобы не привязывать интерфейс к конструктору
         if (context instanceof INoteListActivity) {
             listener = (INoteListActivity) context;
         }
-
-//        if (context instanceof NoteDialog.NoteDialogController) {
-//            dialogController = (NoteDialog.NoteDialogController) context;
-//        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(TAG, "List onCreateView() called with: inflater = [" + inflater + "], container = [" + container + "], savedInstanceState = [" + savedInstanceState + "]");
+        Log.d(TAG, "List onCreateView() called");
 
         return inflater.inflate(R.layout.fragment_notes_list, container, false);
 
@@ -125,6 +120,7 @@ public class NotesListFragment extends Fragment
         touchHelper.attachToRecyclerView(recyclerView);
     }
 
+    // Реализуем клик на земетку
     @Override
     public void onNoteClick(Note note) {
 
@@ -133,14 +129,13 @@ public class NotesListFragment extends Fragment
     }
 
 
+    // Создание top bar menu
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.main, menu);
     }
 
-    /*
-     * Method to create a new note
-     */
+    // Создание новой заметки по клику на top bar menu
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.main_create) {
@@ -160,18 +155,18 @@ public class NotesListFragment extends Fragment
         }
     }
 
-    private void showLandEditNotes(Bundle bundle) {
-        Fragment editNoteFragment = new EditNoteFragment();
-        if (bundle != null) {
-            editNoteFragment.setArguments(bundle);
-        }
-
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        fragmentManager
-                .beginTransaction()
-                .replace(R.id.edit_note_container_land, editNoteFragment)
-                .commit();
-    }
+//    private void showLandEditNotes(Bundle bundle) {
+//        Fragment editNoteFragment = new EditNoteFragment();
+//        if (bundle != null) {
+//            editNoteFragment.setArguments(bundle);
+//        }
+//
+//        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+//        fragmentManager
+//                .beginTransaction()
+//                .replace(R.id.edit_note_container_land, editNoteFragment)
+//                .commit();
+//    }
 
 
 
@@ -193,62 +188,42 @@ public class NotesListFragment extends Fragment
         return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
+    // Реализуем клик на элемент контекстного меню
     @Override
     public void onPopupMenuClick(int command, Note note, int position) {
-        switch (command) {
-            case R.id.context_add_new:
-                // TODO: hadle pressing new note
-
-                return;
-            case R.id.context_edit:
-                NoteDialog.getInstance(note)
-                        .show(
-//                                getParentFragmentManager(),
-//                                getChildFragmentManager(),
-                                getFragmentManager(),
-                                Constants.NOTE
-                        );
-                return;
-            case R.id.context_delete:
-                repo.delete(note);
-                adapter.delete(repo.getAll(), position);
-                return;
+        if (command == R.id.context_add_new) {
+            createDialog(null);
+        } else if (command == R.id.context_edit) {
+            createDialog(note);
+        } else if (command == R.id.context_delete) {
+            repo.delete(note);
+            adapter.delete(repo.getAll(), position);
+        } else {
+            throw new IllegalArgumentException("Undefined command argument was received");
         }
     }
 
-//    @Override
-//    public void update(Note note) {
-//        repo.update(note);
-//        adapter.setNotes(repo.getAll());
-//    }
-//
-//    @Override
-//    public void create(String title, String description) {
-//        repo.create(title, description);
-//        // TODO: add date and importance
-//        adapter.setNotes(repo.getAll());
-//    }
+    // Создание диалог фрагмента
+    private void createDialog(Note note) {
+        NoteDialog.getInstance(note, this)
+                .show(
+                        requireActivity().getSupportFragmentManager(),
+                        Constants.NOTE
+                );
+    }
 
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        Log.d(TAG, "List onDestroy() called");
-//    }
-//
-//    @Override
-//    public void onDestroyView() {
-//        super.onDestroyView();
-//        Log.d(TAG, "List onDestroyView() called");
-//    }
-//
-//
-//
-//    @Override
-//    public void onDetach() {
-//        super.onDetach();
-//        Log.d(TAG, "List onDetach() called");
-//    }
+    // Реализуем методы интерфейса NoteDialogController
+    @Override
+    public void update(Note note) {
+        repo.update(note);
+        adapter.setNotes(repo.getAll());
+    }
 
+    @Override
+    public void create(String title, String description) {
+        repo.create(title, description);
+        adapter.setNotes(repo.getAll());
+    }
 
 }
 

@@ -4,12 +4,6 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -23,6 +17,10 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.gb.mynoteorganizer.R;
 import com.gb.mynoteorganizer.data.Constants;
@@ -129,31 +127,6 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
 
         listener.saveNote(note);
     }
-
-    // Сохраняем title и description чтобы их можно было восстановить при повороте экрана
-//    @Override
-//    public void onSaveInstanceState(@NonNull Bundle outState) {
-//        Log.d(TAG, "Edit onSaveInstanceState() called with: outState = [" + outState + "]");
-//        outState.putSerializable(Constants.NOTE, note);
-//        super.onSaveInstanceState(outState);
-//    }
-//
-//    // Восстанавливаем title и description
-//    @Override
-//    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-//        super.onViewStateRestored(savedInstanceState);
-//        if (savedInstanceState != null) {
-//            if (note != null) {
-//                Note saved_note = (Note) savedInstanceState.getSerializable(Constants.NOTE);
-//
-//                evTitle.setText(note.getTitle());
-//                evDescription.setText(note.getDescription());
-//
-//                Log.d(TAG, "Edit onViewStateRestored: " + saved_note.getTitle());
-//                Log.d(TAG, "Edit onViewStateRestored: " + saved_note.getDescription());
-//            }
-//        }
-//    }
 
 
     @Override

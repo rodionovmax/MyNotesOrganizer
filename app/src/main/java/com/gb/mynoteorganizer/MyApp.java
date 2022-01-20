@@ -10,9 +10,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+// Расширяем класс Application чтобы создать список заметок в самом начале.
+// Нужен чтобы заметки не дублировались при поворотах экрана и создании/редактировании заметок
 public class MyApp extends Application {
 
-    private Repo repo = RepoImpl.getInstance();
+    private final Repo repo = RepoImpl.getInstance();
 
     @Override
     public void onCreate() {

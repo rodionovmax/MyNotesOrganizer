@@ -2,9 +2,7 @@ package com.gb.mynoteorganizer.ui;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -16,16 +14,17 @@ import androidx.fragment.app.DialogFragment;
 import com.gb.mynoteorganizer.R;
 import com.gb.mynoteorganizer.data.Constants;
 import com.gb.mynoteorganizer.data.Note;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 public class NoteDialog extends DialogFragment {
 
     public static final String TAG = "myCustomLogger";
+    private Note note;
 
+    // Интерфейс диалог фрагмента который реализует добавление/изменение заметки в лист фрагменте
     interface NoteDialogController {
         void update(Note note);
         void create(String title, String description);
@@ -36,30 +35,38 @@ public class NoteDialog extends DialogFragment {
 
     @Override
     public void onAttach(@NonNull Context context) {
-        if (context instanceof NoteDialogController) {
-            dialogController = (NoteDialogController) context;
-//            dialogController = (NoteDialogController) getTargetFragment();
-        } else {
-            throw new IllegalStateException("Activity must implement controller");
-        }
+//        if (context instanceof NoteDialogController) {
+//            dialogController = (NoteDialogController) context;
+//        } else {
+//            throw new IllegalStateException("Activity must implement controller");
+//        }
         super.onAttach(context);
     }
 
-    private Note note;
-
-    public static NoteDialog getInstance(Note note) {
-        NoteDialog dialog = new NoteDialog();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(Constants.NOTE, note);
-        dialog.setArguments(bundle);
+    // Создаем статический экземпляр диалог фрагмента
+    public static NoteDialog getInstance(Note note, NoteDialogController listener) {
+        NoteDialog dialog = new NoteDialog(listener);
+        if (note != null) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(Constants.NOTE, note);
+            dialog.setArguments(bundle);
+        }
         return dialog;
+    }
+
+    // Конструктор диалог фрагмента
+    // Передаем слушатель интерфейса который реализует update и create в лист фрагменте
+    private NoteDialog (NoteDialogController listener) {
+        this.dialogController = listener;
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         Bundle bundle = getArguments();
-        note = (Note) bundle.getSerializable(Constants.NOTE);
+        if (bundle != null) {
+            note = (Note) bundle.getSerializable(Constants.NOTE);
+        }
 
         String title = "";
         String description = "";
@@ -79,8 +86,11 @@ public class NoteDialog extends DialogFragment {
         TextInputLayout dialogTitle = dialog.findViewById(R.id.dialog_title);
         TextInputLayout dialogDescription = dialog.findViewById(R.id.dialog_description);
 
-        dialogTitle.getEditText().setText(title);
-        dialogDescription.getEditText().setText(description);
+        if (dialogTitle.getEditText() != null) {
+            dialogTitle.getEditText().setText(title);
+        }
+
+        Objects.requireNonNull(dialogDescription.getEditText()).setText(description);
         // TODO: set date picker and spinner for importance
 
         // Собирание диалогового окна
@@ -99,25 +109,22 @@ public class NoteDialog extends DialogFragment {
                 .setView(dialog)
                 .setCancelable(true)
                 .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.cancel())
-                .setPositiveButton(buttonText, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if (note == null) {
-                            dialogController.create(
-                                    dialogTitle.getEditText().getText().toString(),
-                                    dialogDescription.getEditText().getText().toString()
-                                    // TODO: add date and importance
-                            );
+                .setPositiveButton(buttonText, (dialogInterface, i) -> {
+                    if (note == null) {
+                        dialogController.create(
+                                dialogTitle.getEditText().getText().toString(),
+                                dialogDescription.getEditText().getText().toString()
+                                // TODO: add date and importance
+                        );
 
-                        } else {
-                            note.setTitle(dialogTitle.getEditText().getText().toString());
-                            note.setDescription(dialogDescription.getEditText().getText().toString());
-                            note.setDate(new Date());  // dummy value
-                            note.setImportance(1);  // dummy value
-                            dialogController.update(note);
-                        }
-                        dialogInterface.dismiss();
+                    } else {
+                        note.setTitle(dialogTitle.getEditText().getText().toString());
+                        note.setDescription(dialogDescription.getEditText().getText().toString());
+                        note.setDate(new Date());  // dummy value
+                        note.setImportance(1);  // dummy value
+                        dialogController.update(note);
                     }
+                    dialogInterface.dismiss();
                 });
 
         return builder.create();

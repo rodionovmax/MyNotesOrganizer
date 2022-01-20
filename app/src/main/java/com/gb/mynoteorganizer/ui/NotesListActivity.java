@@ -1,28 +1,17 @@
 package com.gb.mynoteorganizer.ui;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.res.Configuration;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 
 import com.gb.mynoteorganizer.R;
 import com.gb.mynoteorganizer.data.Constants;
 import com.gb.mynoteorganizer.data.Note;
-import com.gb.mynoteorganizer.data.Repo;
-import com.gb.mynoteorganizer.data.RepoImpl;
-import com.gb.mynoteorganizer.recycler.NotesAdapter;
 
-public class NotesListActivity extends BaseActivity implements INoteListActivity
-        , NoteDialog.NoteDialogController
-{
+public class NotesListActivity extends BaseActivity implements INoteListActivity {
 
     private Note note = null;
-    private Repo repo = RepoImpl.getInstance();
-    private NotesAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,18 +31,21 @@ public class NotesListActivity extends BaseActivity implements INoteListActivity
     }
 
 
+    // Сохраняем заметку перед поворотом экрана
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable(Constants.NOTE, note);
     }
 
+    // Восстанавливаем заметку после поворота экрана
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         note = (Note) savedInstanceState.getSerializable(Constants.NOTE);
     }
 
+    // Реализуем методы для добавления фрагментов
     @Override
     public void replaceNotesListPort(boolean isNoteNew) {
         replace(R.id.notes_list_fragment_holder, NotesListFragment.newInstance(isNoteNew));
@@ -86,20 +78,9 @@ public class NotesListActivity extends BaseActivity implements INoteListActivity
         this.note = note;
     }
 
-    @Override
-    public void update(Note note) {
-        repo.update(note);
-        adapter.setNotes(repo.getAll());
-    }
-
-    @Override
-    public void create(String title, String description) {
-        repo.create(title, description);
-        // TODO: add date and importance
-        adapter.setNotes(repo.getAll());
-    }
 }
 
+// Интерфейс добавления фрагментов
 interface INoteListActivity {
     void replaceNotesListPort(boolean isNoteNew);
     void replaceEditNotePort(Note note);
