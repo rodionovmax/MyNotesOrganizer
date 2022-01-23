@@ -2,6 +2,7 @@ package com.gb.mynoteorganizer.ui;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +14,9 @@ import com.gb.mynoteorganizer.data.Note;
 
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements InterfaceMainActivity {
+public class MainActivity extends AppCompatActivity implements
+        InterfaceMainActivity,
+        ConfirmDialog.OnConfirmationDialogClickListener {
 
     private Note note = null;
     private FragmentManager fragmentManager;
@@ -74,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements InterfaceMainActi
         fragmentManager
                 .beginTransaction()
                 .replace(R.id.notes_list_fragment_holder, EditNoteFragment.newInstance(note))
-//                .addToBackStack(null)
+                .addToBackStack(null)
                 .commit();
     }
 
@@ -91,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements InterfaceMainActi
         fragmentManager
                 .beginTransaction()
                 .replace(R.id.edit_note_fragment_holder, EditNoteFragment.newInstance(note))
-//                .addToBackStack(null)
+                .addToBackStack(null)
                 .commit();
     }
 
@@ -108,6 +111,30 @@ public class MainActivity extends AppCompatActivity implements InterfaceMainActi
     @Override
     public void saveNote(Note note) {
         this.note = note;
+    }
+
+    // Переопределяем onBackPressed чтобы спросить подтверждение перед тем как закрыть приложение
+    // Если в onBackStack больше нет фрагментов то показываем диалог
+    // Реализован через диалог фрагмент чтобы алерт не пропадал при повороте экрана
+    @Override
+    public void onBackPressed() {
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+            showConfirmDialogFragment();
+        } else {
+            MainActivity.super.onBackPressed();
+        }
+    }
+
+    // Показать диалог
+    private void showConfirmDialogFragment() {
+        new ConfirmDialog().show(getSupportFragmentManager(), null);
+    }
+
+    // Реализуем интерфейс OnConfirmationDialogClickListener
+    @Override
+    public void onConfirm() {
+        Toast.makeText(MainActivity.this, "Bye-bye", Toast.LENGTH_SHORT).show();
+        super.onBackPressed();
     }
 
 }

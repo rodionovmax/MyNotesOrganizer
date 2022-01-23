@@ -16,6 +16,10 @@
     <string name="dialog_description_hint">Description</string>
     <string name="top_bar_menu_create">Create</string>
     <string name="dialog_calendar_hint">Choose the date</string>
+    <string name="exit_dialog_message">Are you sure you want to close the app?</string>
+    <string name="exit_dialog_title">Leaving?</string>
+    <string name="button_text_yes">Yes</string>
+    <string name="button_text_no">No</string>
 
     <string-array name="importance">
         <item>Not Important</item>
