@@ -121,12 +121,10 @@ public class NotesListFragment extends Fragment
         touchHelper.attachToRecyclerView(recyclerView);
     }
 
-    // Реализуем клик на земетку
+    // Реализуем клик на заметку
     @Override
     public void onNoteClick(Note note) {
-
-        // переименовать в то что реализуется
-        createEditNoteFragment(note);
+        createEditFragment(note);
     }
 
 
@@ -140,50 +138,19 @@ public class NotesListFragment extends Fragment
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.main_create) {
-            createEditNoteFragment(null);
+            createEditFragment(null);
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void createEditNoteFragment(Note note) {
+    private void createEditFragment(Note note) {
         if (isLandscape()) {
-            listener.replaceEditNoteLand(note);
-//            showLandEditNotes(note);
+            listener.replaceEditLand(note);
         } else {
-            listener.replaceEditNotePort(note);
-//            showPortEditNotes(bundle);
+            listener.replaceEditPort(note);
         }
     }
-
-//    private void showLandEditNotes(Bundle bundle) {
-//        Fragment editNoteFragment = new EditNoteFragment();
-//        if (bundle != null) {
-//            editNoteFragment.setArguments(bundle);
-//        }
-//
-//        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-//        fragmentManager
-//                .beginTransaction()
-//                .replace(R.id.edit_note_container_land, editNoteFragment)
-//                .commit();
-//    }
-
-
-
-//    private void showPortEditNotes(Bundle bundle) {
-//        Fragment editNoteFragment = new EditNoteFragment();
-//        if (bundle != null) {
-//            editNoteFragment.setArguments(bundle);
-//        }
-//
-//        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-//        fragmentManager
-//                .beginTransaction()
-//                .replace(R.id.notes_list_fragment_holder, editNoteFragment)
-//                .addToBackStack(null)
-//                .commit();
-//    }
 
     public boolean isLandscape() {
         return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;

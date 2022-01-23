@@ -4,28 +4,43 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.gb.mynoteorganizer.R;
 import com.gb.mynoteorganizer.data.Constants;
 import com.gb.mynoteorganizer.data.Note;
 
-public class MainActivity extends BaseActivity implements InterfaceMainActivity {
+import java.util.Objects;
+
+public class MainActivity extends AppCompatActivity implements InterfaceMainActivity {
 
     private Note note = null;
+    private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        fragmentManager = getSupportFragmentManager();
+
+        // Добавление List fragment при первом запуске
+        if (savedInstanceState == null) {
+            fragmentManager
+                    .beginTransaction()
+                    .add(R.id.notes_list_fragment_holder, NotesListFragment.newInstance(false))
+                    .commit();
+        }
+
         if (savedInstanceState != null) {
             note = (Note) savedInstanceState.getSerializable(Constants.NOTE);
         }
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            replaceNotesListPort(false);
+            replaceListPort(false);
         } else {
-            replaceNotesListLand();
-            replaceEditNoteLand(note);
+            replaceListLand();
+            replaceEditLand(note);
         }
 
     }
@@ -47,29 +62,46 @@ public class MainActivity extends BaseActivity implements InterfaceMainActivity 
 
     // Реализуем методы для добавления фрагментов
     @Override
-    public void replaceNotesListPort(boolean isNoteNew) {
-        replace(R.id.notes_list_fragment_holder, NotesListFragment.newInstance(isNoteNew));
+    public void replaceListPort(boolean isNoteNew) {
+        fragmentManager
+                .beginTransaction()
+                .replace(R.id.notes_list_fragment_holder, NotesListFragment.newInstance(isNoteNew))
+                .commit();
     }
 
     @Override
-    public void replaceEditNotePort(Note note) {
-        replace(R.id.notes_list_fragment_holder, EditNoteFragment.newInstance(note));
+    public void replaceEditPort(Note note) {
+        fragmentManager
+                .beginTransaction()
+                .replace(R.id.notes_list_fragment_holder, EditNoteFragment.newInstance(note))
+//                .addToBackStack(null)
+                .commit();
     }
 
     @Override
-    public void replaceNotesListLand() {
-        replace(R.id.notes_list_fragment_holder, NotesListFragment.newInstance(false));
+    public void replaceListLand() {
+        fragmentManager
+                .beginTransaction()
+                .replace(R.id.notes_list_fragment_holder, NotesListFragment.newInstance(false))
+                .commit();
     }
 
     @Override
-    public void replaceEditNoteLand(Note note) {
-        replace(R.id.edit_note_container_land, EditNoteFragment.newInstance(note));
+    public void replaceEditLand(Note note) {
+        fragmentManager
+                .beginTransaction()
+                .replace(R.id.edit_note_fragment_holder, EditNoteFragment.newInstance(note))
+//                .addToBackStack(null)
+                .commit();
     }
 
     @Override
-    public void removeEditNoteFragment() {
-        if (getSupportFragmentManager().findFragmentById(R.id.edit_note_container_land) != null) {
-            remove(getSupportFragmentManager().findFragmentById(R.id.edit_note_container_land));
+    public void removeEditFragment() {
+        if (fragmentManager.findFragmentById(R.id.edit_note_fragment_holder) != null) {
+            fragmentManager
+                    .beginTransaction()
+                    .remove(Objects.requireNonNull(fragmentManager.findFragmentById(R.id.edit_note_fragment_holder)))
+                    .commit();
         }
     }
 
@@ -82,10 +114,10 @@ public class MainActivity extends BaseActivity implements InterfaceMainActivity 
 
 // Интерфейс добавления фрагментов
 interface InterfaceMainActivity {
-    void replaceNotesListPort(boolean isNoteNew);
-    void replaceEditNotePort(Note note);
-    void replaceNotesListLand();
-    void replaceEditNoteLand(Note note);
-    void removeEditNoteFragment();
+    void replaceListPort(boolean isNoteNew);
+    void replaceEditPort(Note note);
+    void replaceListLand();
+    void replaceEditLand(Note note);
+    void removeEditFragment();
     void saveNote(Note note);
 }

@@ -112,7 +112,9 @@ public class NoteDialog extends DialogFragment implements AdapterView.OnItemSele
         // Слушатель на Spinner
         dialogSpinner.setOnItemSelectedListener(this);
 
-        dialogSpinner.setSelection(note.getImportance());
+        if (note != null) {
+            dialogSpinner.setSelection(note.getImportance());
+        }
 
         // Собирание диалогового окна
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
