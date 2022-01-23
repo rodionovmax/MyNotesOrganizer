@@ -9,14 +9,14 @@ import com.gb.mynoteorganizer.R;
 import com.gb.mynoteorganizer.data.Constants;
 import com.gb.mynoteorganizer.data.Note;
 
-public class NotesListActivity extends BaseActivity implements INoteListActivity {
+public class MainActivity extends BaseActivity implements InterfaceMainActivity {
 
     private Note note = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notes_list);
+        setContentView(R.layout.activity_main);
 
         if (savedInstanceState != null) {
             note = (Note) savedInstanceState.getSerializable(Constants.NOTE);
@@ -81,7 +81,7 @@ public class NotesListActivity extends BaseActivity implements INoteListActivity
 }
 
 // Интерфейс добавления фрагментов
-interface INoteListActivity {
+interface InterfaceMainActivity {
     void replaceNotesListPort(boolean isNoteNew);
     void replaceEditNotePort(Note note);
     void replaceNotesListLand();

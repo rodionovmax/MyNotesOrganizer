@@ -52,7 +52,7 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
 
     private Repo repo = RepoImpl.getInstance();
 
-    private INoteListActivity listener;
+    private InterfaceMainActivity listener;
 
     public static Fragment newInstance(Note note) {
         Fragment fragment = new EditNoteFragment();
@@ -76,8 +76,8 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         Log.d(TAG, "Edit onAttach() called with: context = [" + context + "]");
-        if (context instanceof INoteListActivity) {
-            listener = (INoteListActivity) context;
+        if (context instanceof InterfaceMainActivity) {
+            listener = (InterfaceMainActivity) context;
         }
     }
 
@@ -183,7 +183,6 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
 
     }
 
-
     // Слушатель изменения текста в title
     private TextWatcher titleTextWatcher = new TextWatcher() {
         @Override
@@ -228,32 +227,5 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.d(TAG, "Edit onCreate() called with: savedInstanceState = [" + savedInstanceState + "]");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "Edit onDestroy() called");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.d(TAG, "Edit onDestroyView() called");
-    }
-
-
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.d(TAG, "Edit onDetach() called");
-    }
-
-
+    
 }

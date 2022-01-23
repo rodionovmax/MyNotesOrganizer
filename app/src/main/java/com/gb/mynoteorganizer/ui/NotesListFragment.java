@@ -9,7 +9,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,6 +28,8 @@ import com.gb.mynoteorganizer.data.Repo;
 import com.gb.mynoteorganizer.data.RepoImpl;
 import com.gb.mynoteorganizer.recycler.NotesAdapter;
 
+import java.util.Date;
+
 
 public class NotesListFragment extends Fragment
         implements NotesAdapter.OnNoteClickListener,
@@ -40,7 +41,7 @@ public class NotesListFragment extends Fragment
     private final Repo repo = RepoImpl.getInstance();
     private NotesAdapter adapter;
 
-    private INoteListActivity listener;
+    private InterfaceMainActivity listener;
 
     // Создаем статический экземпляр лист фрагмента чтобы вызывать его в активити
     public static Fragment newInstance(boolean isNoteNew) {
@@ -65,8 +66,8 @@ public class NotesListFragment extends Fragment
         Log.d(TAG, "List onAttach() called with: context = [" + context + "]");
 
         // Для инициализации интерфейса. Чтобы не привязывать интерфейс к конструктору
-        if (context instanceof INoteListActivity) {
-            listener = (INoteListActivity) context;
+        if (context instanceof InterfaceMainActivity) {
+            listener = (InterfaceMainActivity) context;
         }
     }
 
@@ -220,8 +221,8 @@ public class NotesListFragment extends Fragment
     }
 
     @Override
-    public void create(String title, String description) {
-        repo.create(title, description);
+    public void create(String title, String description, Date date, int importance) {
+        repo.create(title, description, date, importance);
         adapter.setNotes(repo.getAll());
     }
 

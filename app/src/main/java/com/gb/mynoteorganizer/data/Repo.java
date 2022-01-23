@@ -6,7 +6,6 @@ import java.util.List;
 public interface Repo {
 
     int create(Note note);
-    int create(String title, String description);
     int create(String title, String description, Date date, int importance);
     Note read(int id);
     void update(Note note);

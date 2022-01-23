@@ -5,22 +5,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.NotesListActivity">
+    tools:context=".ui.MainActivity">
 
+    <!--new view. ask teacher why we're not using this-->
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/notes_list_fragment_holder"
-        android:layout_width="0px"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
+        android:id="@+id/notes_list_fragment_holder"
         android:background="@color/orange_background">
     </androidx.fragment.app.FragmentContainerView>
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/edit_note_container_land"
-        android:layout_width="0px"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="@color/orange_background" />
 
 
 </LinearLayout>

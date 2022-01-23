@@ -29,15 +29,10 @@ public class RepoImpl implements Repo {
     }
 
     @Override
-    public int create(String title, String description) {
-        Note note = new Note(++counter, title, description);
+    public int create(String title, String description, Date date, int importance) {
+        Note note = new Note(++counter, title, description, date, importance);
         notes.add(note);
         return note.getId();
-    }
-
-    @Override
-    public int create(String title, String description, Date date, int importance) {
-        return 0;
     }
 
     @Override
