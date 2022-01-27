@@ -27,21 +27,16 @@ import com.gb.mynoteorganizer.data.Note;
 import com.gb.mynoteorganizer.data.Repo;
 import com.gb.mynoteorganizer.data.RepoImpl;
 import com.gb.mynoteorganizer.data.SharedPref;
-import com.gb.mynoteorganizer.data.SharedPrefsRepo;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 public class EditNoteFragment extends Fragment implements
         View.OnClickListener,
-        AdapterView.OnItemSelectedListener,
-        SharedPrefsRepo {
+        AdapterView.OnItemSelectedListener {
 
     private static final String NOTE = "NOTE";
     private static final String TAG = "myLogger";
@@ -169,17 +164,11 @@ public class EditNoteFragment extends Fragment implements
 
         if (id == -1) {
             repo.create(updatedNote);
-
-            // Сохраняем изменение List<Notes> в shared preferences
-            String notesString = gson.toJson(repo.getAll());
-            SharedPref.write(Constants.NOTES_KEY, notesString);
         } else {
             repo.update(updatedNote);
-
-            // Сохраняем изменение List<Notes> в shared preferences
-            String notesString = gson.toJson(repo.getAll());
-            SharedPref.write(Constants.NOTES_KEY, notesString);
         }
+        // Сохраняем изменение в репо в файл shared preferences
+        saveNotes();
 
         NotesListFragment notesListFragment = new NotesListFragment();
         Bundle bundle = new Bundle();
@@ -242,14 +231,9 @@ public class EditNoteFragment extends Fragment implements
 
     }
 
-
-    @Override
-    public ArrayList<Note> getNotes() {
-        String sharedPrefsNotes = SharedPref.read(Constants.NOTES_KEY, "");
-        ArrayList<Note> notes =  gson.fromJson(sharedPrefsNotes, new TypeToken<List<Note>>(){}.getType());
-        if (notes == null) {
-            notes = new ArrayList<>();
-        }
-        return notes;
+    // Сохраняем изменение в репо в файл shared preferences
+    private void saveNotes() {
+        String notesString = gson.toJson(repo.getAll());
+        SharedPref.write(Constants.NOTES_KEY, notesString);
     }
 }

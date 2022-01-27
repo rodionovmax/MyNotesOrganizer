@@ -48,8 +48,6 @@ public class NotesListFragment extends Fragment
     private final Repo repo = RepoImpl.getInstance();
     private NotesAdapter adapter;
     private Gson gson = new Gson();
-    List<Note> savedNotes = new ArrayList<>();
-
 
     private InterfaceMainActivity listener;
 
@@ -98,11 +96,8 @@ public class NotesListFragment extends Fragment
 
         Log.d(TAG, "onViewCreated() called with: view = [List], savedInstanceState = [" + savedInstanceState + "]");
 
-        // Получаем notes из shared preferences
-        savedNotes = getNotes();
-
         adapter = new NotesAdapter();
-        adapter.setNotes(savedNotes);
+        adapter.setNotes(repo.getAll());
 
         adapter.setOnNoteClickListener(this);
         adapter.setOnPopupMenuClickListener(this);
@@ -131,10 +126,8 @@ public class NotesListFragment extends Fragment
                 Note note = holder.getNote();
                 repo.delete(note);
                 adapter.delete(repo.getAll(), position);
-
-                // Сохраняем изменение List<Notes> в shared preferences
-                String notesString = gson.toJson(repo.getAll());
-                SharedPref.write(Constants.NOTES_KEY, notesString);
+                // Сохраняем изменение в репо в файл shared preferences
+                saveNotes();
             }
         });
         touchHelper.attachToRecyclerView(recyclerView);
@@ -185,10 +178,9 @@ public class NotesListFragment extends Fragment
         } else if (command == R.id.context_delete) {
             repo.delete(note);
             adapter.delete(repo.getAll(), position);
+            // Сохраняем изменение в репо в файл shared preferences
+            saveNotes();
 
-            // Сохраняем изменение List<Notes> в shared preferences
-            String notesString = gson.toJson(repo.getAll());
-            SharedPref.write(Constants.NOTES_KEY, notesString);
         } else {
             throw new IllegalArgumentException("Undefined command argument was received");
         }
@@ -208,20 +200,16 @@ public class NotesListFragment extends Fragment
     public void update(Note note) {
         repo.update(note);
         adapter.setNotes(repo.getAll());
-
-        // Сохраняем изменение List<Notes> в shared preferences
-        String notesString = gson.toJson(repo.getAll());
-        SharedPref.write(Constants.NOTES_KEY, notesString);
+        // Сохраняем изменение в репо в файл shared preferences
+        saveNotes();
     }
 
     @Override
     public void create(String title, String description, Date date, int importance) {
         repo.create(title, description, date, importance);
         adapter.setNotes(repo.getAll());
-
-        // Сохраняем изменение List<Notes> в shared preferences
-        String notesString = gson.toJson(repo.getAll());
-        SharedPref.write(Constants.NOTES_KEY, notesString);
+        // Сохраняем изменение в репо в файл shared preferences
+        saveNotes();
     }
 
     @Override
@@ -232,6 +220,12 @@ public class NotesListFragment extends Fragment
             notes = new ArrayList<>();
         }
         return notes;
+    }
+
+    // Сохраняем изменение в репо в файл shared preferences
+    private void saveNotes() {
+        String notesString = gson.toJson(repo.getAll());
+        SharedPref.write(Constants.NOTES_KEY, notesString);
     }
 }
 

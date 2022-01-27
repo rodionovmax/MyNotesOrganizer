@@ -1,5 +1,7 @@
 package com.gb.mynoteorganizer.ui;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -16,8 +18,18 @@ import androidx.fragment.app.FragmentManager;
 import com.gb.mynoteorganizer.R;
 import com.gb.mynoteorganizer.data.Constants;
 import com.gb.mynoteorganizer.data.Note;
+import com.gb.mynoteorganizer.data.Repo;
+import com.gb.mynoteorganizer.data.RepoImpl;
+import com.gb.mynoteorganizer.data.SharedPref;
 import com.google.android.material.navigation.NavigationView;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements
@@ -28,11 +40,32 @@ public class MainActivity extends AppCompatActivity implements
     private Note note = null;
     private FragmentManager fragmentManager;
     private DrawerLayout drawer;
+    private Gson gson = new Gson();
+    private final Repo repo = RepoImpl.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Получить заметки из shared preferences file
+        Context mContext = getApplicationContext();
+        SharedPref.init(mContext);
+
+        String sharedPrefsNotes = SharedPref.read(Constants.NOTES_KEY, "");
+        ArrayList<Note> savedNotes = gson.fromJson(sharedPrefsNotes, new TypeToken<List<Note>>(){}.getType());
+        if (savedNotes == null) {
+            savedNotes = new ArrayList<>();
+        }
+
+        // При первом запуске добавить заметки из файла в репо
+        if (savedInstanceState == null) {
+            if (!savedNotes.isEmpty()) {
+                for (Note note : savedNotes) {
+                    repo.create(note);
+                }
+            }
+        }
 
         // Инициализируем тулбар и drawer
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -192,6 +225,15 @@ public class MainActivity extends AppCompatActivity implements
                 .beginTransaction()
                 .addToBackStack("")
                 .add(R.id.notes_list_fragment_holder, new AboutFragment()).commit();
+    }
+
+    public ArrayList<Note> getNotes() {
+        String sharedPrefsNotes = SharedPref.read(Constants.NOTES_KEY, "");
+        ArrayList<Note> notes = gson.fromJson(sharedPrefsNotes, new TypeToken<List<Note>>(){}.getType());
+        if (notes == null) {
+            notes = new ArrayList<>();
+        }
+        return notes;
     }
 }
 
