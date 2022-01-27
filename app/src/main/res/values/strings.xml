@@ -8,6 +8,14 @@
     <string name="edit_text_due_date">Due Date</string>
     <string name="due_date_btn">Due Date</string>
     <string name="importance_txt">Importance:</string>
+    <string name="context_menu_edit">Edit</string>
+    <string name="context_menu_delete">Delete</string>
+    <string name="note_menu">Note Menu</string>
+    <string name="add_new">Add new</string>
+    <string name="dialog_title_hint">Title</string>
+    <string name="dialog_description_hint">Description</string>
+    <string name="top_bar_menu_create">Create</string>
+    <string name="dialog_calendar_hint">Choose the date</string>
 
     <string-array name="importance">
         <item>Not Important</item>

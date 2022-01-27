@@ -1,14 +1,9 @@
 package com.gb.mynoteorganizer.ui;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -18,10 +13,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.gb.mynoteorganizer.R;
 import com.gb.mynoteorganizer.data.Constants;
@@ -53,6 +51,18 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
 
     private Repo repo = RepoImpl.getInstance();
 
+    private InterfaceMainActivity listener;
+
+    public static Fragment newInstance(Note note) {
+        Fragment fragment = new EditNoteFragment();
+        if (note != null) {
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(NOTE, note);
+            fragment.setArguments(bundle);
+        }
+        return fragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -62,8 +72,18 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        Log.d(TAG, "Edit onAttach() called with: context = [" + context + "]");
+        if (context instanceof InterfaceMainActivity) {
+            listener = (InterfaceMainActivity) context;
+        }
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG, "Edit onViewCreated() called with: view = [Edit], savedInstanceState = [" + savedInstanceState + "]");
 
         evTitle = view.findViewById(R.id.edit_note_title);
         evDescription = view.findViewById(R.id.edit_note_description);
@@ -80,13 +100,15 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
         Bundle args = getArguments();
         if (args != null) {
             note = (Note) args.getSerializable(NOTE);
-            id = note.getId();
-            evTitle.setText(note.getTitle());
-            evDescription.setText(note.getDescription());
-            if (note.getDate() != null) {
-                tvDate.setText(new SimpleDateFormat("dd-MM-yyyy").format(note.getDate()));
+            if (note != null) {
+                id = note.getId();
+                evTitle.setText(note.getTitle());
+                evDescription.setText(note.getDescription());
+                if (note.getDate() != null) {
+                    tvDate.setText(new SimpleDateFormat("dd-MM-yyyy").format(note.getDate()));
+                }
+                spinner.setSelection(note.getImportance());
             }
-            spinner.setSelection(note.getImportance());
         }
 
         // Сделать кнопку неактивной если title пустой
@@ -101,6 +123,15 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
 
         // Слушатель на Spinner
         spinner.setOnItemSelectedListener(this);
+
+        listener.saveNote(note);
+    }
+
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.d(TAG, "Edit onConfigurationChanged() called with: newConfig = [" + newConfig + "]");
     }
 
     private void showDatePicker() {
@@ -110,12 +141,9 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
         int year = cldr.get(Calendar.YEAR);
         // date picker dialog
         datePicker = new DatePickerDialog(requireActivity(),
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        tvDate.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
-                        setDateFromTextView();
-                    }
+                (view, year1, monthOfYear, dayOfMonth) -> {
+                    tvDate.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year1);
+                    setDateFromTextView();
                 }, year, month, day);
         datePicker.show();
     }
@@ -141,24 +169,15 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
         notesListFragment.setArguments(bundle);
 
         // Если ориентация портретная - перейти на фрагмент лист
-        // Если ориентация ландшафтная - перейти на фрагмент лист и удалить текущий фрагмент
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+        // Если ориентация ландшафтная - перейти на фрагмент лист и удалить edit фрагмент
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            fragmentManager
-                    .beginTransaction()
-                    .replace(R.id.notes_list_fragment_holder, notesListFragment)
-                    .addToBackStack(null)
-                    .commit();
+            listener.replaceListPort(true);
         } else {
-            fragmentManager
-                    .beginTransaction()
-                    .replace(R.id.notes_list_fragment_holder, notesListFragment)
-                    .remove(this)
-                    .commit();
+            listener.removeEditFragment();
+            listener.replaceListLand();
         }
 
     }
-
 
     // Слушатель изменения текста в title
     private TextWatcher titleTextWatcher = new TextWatcher() {
@@ -204,4 +223,5 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
+    
 }

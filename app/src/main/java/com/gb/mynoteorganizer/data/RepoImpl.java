@@ -1,6 +1,7 @@
 package com.gb.mynoteorganizer.data;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class RepoImpl implements Repo {
@@ -25,6 +26,13 @@ public class RepoImpl implements Repo {
         note.setId(id);
         notes.add(note);
         return id;
+    }
+
+    @Override
+    public int create(String title, String description, Date date, int importance) {
+        Note note = new Note(++counter, title, description, date, importance);
+        notes.add(note);
+        return note.getId();
     }
 
     @Override
@@ -55,6 +63,11 @@ public class RepoImpl implements Repo {
                 break;
             }
         }
+    }
+
+    @Override
+    public void delete(Note note) {
+        delete(note.getId());
     }
 
     @Override

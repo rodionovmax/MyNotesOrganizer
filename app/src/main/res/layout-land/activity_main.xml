@@ -5,18 +5,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.NotesListActivity">
+    tools:context=".ui.MainActivity">
 
-    <FrameLayout
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/notes_list_fragment_holder"
         android:layout_width="0px"
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:background="@color/orange_background">
-    </FrameLayout>
+    </androidx.fragment.app.FragmentContainerView>
 
-    <FrameLayout
-        android:id="@+id/edit_note_container_land"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/edit_note_fragment_holder"
         android:layout_width="0px"
         android:layout_height="match_parent"
         android:layout_weight="1"
