@@ -26,20 +26,28 @@ import com.gb.mynoteorganizer.data.Constants;
 import com.gb.mynoteorganizer.data.Note;
 import com.gb.mynoteorganizer.data.Repo;
 import com.gb.mynoteorganizer.data.RepoImpl;
+import com.gb.mynoteorganizer.data.SharedPref;
+import com.gb.mynoteorganizer.data.SharedPrefsRepo;
 import com.gb.mynoteorganizer.recycler.NotesAdapter;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 public class NotesListFragment extends Fragment
         implements NotesAdapter.OnNoteClickListener,
         NotesAdapter.OnPopupMenuClickListener,
-        NoteDialog.NoteDialogController
+        NoteDialog.NoteDialogController,
+        SharedPrefsRepo
 {
 
     private static final String TAG = "myLogger";
     private final Repo repo = RepoImpl.getInstance();
     private NotesAdapter adapter;
+    private Gson gson = new Gson();
 
     private InterfaceMainActivity listener;
 
@@ -69,6 +77,8 @@ public class NotesListFragment extends Fragment
         if (context instanceof InterfaceMainActivity) {
             listener = (InterfaceMainActivity) context;
         }
+
+        SharedPref.init(context.getApplicationContext());
     }
 
     @Override
@@ -116,6 +126,8 @@ public class NotesListFragment extends Fragment
                 Note note = holder.getNote();
                 repo.delete(note);
                 adapter.delete(repo.getAll(), position);
+                // Сохраняем изменение в репо в файл shared preferences
+                saveNotes();
             }
         });
         touchHelper.attachToRecyclerView(recyclerView);
@@ -166,6 +178,9 @@ public class NotesListFragment extends Fragment
         } else if (command == R.id.context_delete) {
             repo.delete(note);
             adapter.delete(repo.getAll(), position);
+            // Сохраняем изменение в репо в файл shared preferences
+            saveNotes();
+
         } else {
             throw new IllegalArgumentException("Undefined command argument was received");
         }
@@ -185,13 +200,32 @@ public class NotesListFragment extends Fragment
     public void update(Note note) {
         repo.update(note);
         adapter.setNotes(repo.getAll());
+        // Сохраняем изменение в репо в файл shared preferences
+        saveNotes();
     }
 
     @Override
     public void create(String title, String description, Date date, int importance) {
         repo.create(title, description, date, importance);
         adapter.setNotes(repo.getAll());
+        // Сохраняем изменение в репо в файл shared preferences
+        saveNotes();
     }
 
+    @Override
+    public ArrayList<Note> getNotes() {
+        String sharedPrefsNotes = SharedPref.read(Constants.NOTES_KEY, "");
+        ArrayList<Note> notes =  gson.fromJson(sharedPrefsNotes, new TypeToken<List<Note>>(){}.getType());
+        if (notes == null) {
+            notes = new ArrayList<>();
+        }
+        return notes;
+    }
+
+    // Сохраняем изменение в репо в файл shared preferences
+    private void saveNotes() {
+        String notesString = gson.toJson(repo.getAll());
+        SharedPref.write(Constants.NOTES_KEY, notesString);
+    }
 }
 
