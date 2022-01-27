@@ -26,13 +26,22 @@ import com.gb.mynoteorganizer.data.Constants;
 import com.gb.mynoteorganizer.data.Note;
 import com.gb.mynoteorganizer.data.Repo;
 import com.gb.mynoteorganizer.data.RepoImpl;
+import com.gb.mynoteorganizer.data.SharedPref;
+import com.gb.mynoteorganizer.data.SharedPrefsRepo;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
-public class EditNoteFragment extends Fragment implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class EditNoteFragment extends Fragment implements
+        View.OnClickListener,
+        AdapterView.OnItemSelectedListener,
+        SharedPrefsRepo {
 
     private static final String NOTE = "NOTE";
     private static final String TAG = "myLogger";
@@ -48,10 +57,10 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
     private Spinner spinner;
 
     private int id = -1;
-
     private Repo repo = RepoImpl.getInstance();
-
     private InterfaceMainActivity listener;
+    private Gson gson = new Gson();
+
 
     public static Fragment newInstance(Note note) {
         Fragment fragment = new EditNoteFragment();
@@ -78,6 +87,8 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
         if (context instanceof InterfaceMainActivity) {
             listener = (InterfaceMainActivity) context;
         }
+
+        SharedPref.init(context.getApplicationContext());
     }
 
     @Override
@@ -150,7 +161,6 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onClick(View view) {
-
         if (date == null) {
             setDateFromTextView();
         }
@@ -159,8 +169,16 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
 
         if (id == -1) {
             repo.create(updatedNote);
+
+            // Сохраняем изменение List<Notes> в shared preferences
+            String notesString = gson.toJson(repo.getAll());
+            SharedPref.write(Constants.NOTES_KEY, notesString);
         } else {
             repo.update(updatedNote);
+
+            // Сохраняем изменение List<Notes> в shared preferences
+            String notesString = gson.toJson(repo.getAll());
+            SharedPref.write(Constants.NOTES_KEY, notesString);
         }
 
         NotesListFragment notesListFragment = new NotesListFragment();
@@ -223,5 +241,15 @@ public class EditNoteFragment extends Fragment implements View.OnClickListener, 
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
-    
+
+
+    @Override
+    public ArrayList<Note> getNotes() {
+        String sharedPrefsNotes = SharedPref.read(Constants.NOTES_KEY, "");
+        ArrayList<Note> notes =  gson.fromJson(sharedPrefsNotes, new TypeToken<List<Note>>(){}.getType());
+        if (notes == null) {
+            notes = new ArrayList<>();
+        }
+        return notes;
+    }
 }
