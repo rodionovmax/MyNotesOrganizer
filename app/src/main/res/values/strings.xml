@@ -20,6 +20,16 @@
     <string name="exit_dialog_title">Leaving?</string>
     <string name="button_text_yes">Yes</string>
     <string name="button_text_no">No</string>
+    <string name="nav_item_about">About</string>
+    <string name="nav_item_exit">Exit</string>
+    <string name="nav_item_share">Share</string>
+    <string name="nav_item_send">Send</string>
+    <string name="drawer_header">Notepad</string>
+    <string name="nav_section_communicate">Communicate</string>
+    <string name="navigation_drawer_open">Open Navigation Drawer</string>
+    <string name="navigation_drawer_close">Close Navigation Drawer</string>
+    <string name="about_title">Notepad</string>
+    <string name="about_subtitle">version 0.1</string>
 
     <string-array name="importance">
         <item>Not Important</item>
